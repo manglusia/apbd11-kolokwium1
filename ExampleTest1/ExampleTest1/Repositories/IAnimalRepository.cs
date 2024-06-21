@@ -8,5 +8,5 @@ public interface IAnimalRepository
     Task<GetAnimalWithOwnerDTO> GetAnimalWithOwner(int id);
     Task<AnimalClassDTO> GetAnimalClass(int id);
     Task<List<OwnerDTO>> getOwners(int id);
-    // Task<GetAnimalWithOwnerDTO> createNewAnimal(CreateNewAnimalDTO createNewAnimal);
+    Task<GetAnimalWithOwnerDTO> createNewAnimal(CreateNewAnimalDTO createNewAnimal);
 }

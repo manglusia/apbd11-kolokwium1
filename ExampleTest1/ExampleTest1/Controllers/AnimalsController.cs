@@ -24,7 +24,7 @@ namespace ExampleTest1.Controllers
                 return NotFound();
             }
 
-            var animals = _animalsRepository.GetAnimalWithOwner(id).Result;
+            var animals = await _animalsRepository.GetAnimalWithOwner(id);
             return Ok(animals);
         }
         

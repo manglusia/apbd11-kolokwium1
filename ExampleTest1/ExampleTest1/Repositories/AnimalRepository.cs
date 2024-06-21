@@ -1,3 +1,4 @@
+using Azure.Core;
 using ExampleTest1.Models.DTOs;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.SqlClient;
@@ -136,49 +137,50 @@ join Animal on Animal.ID = Owner.ID WHERE @ID = Animal.ID";
         return getAnimalWithOwnerDto;
     }
 
-    // public async Task<GetAnimalWithOwnerDTO> createNewAnimal(CreateNewAnimalDTO createNewAnimal)
-    // {
-    //     var sqlQuery = @"INSERT INTO Animal VALUES(@Name, @AdmissionDate, @OwnerId);
-				// 	   SELECT @@IDENTITY AS ID;";
-    //     
-    //     await using SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("Default"));
-    //     await using SqlCommand command = new SqlCommand();
-	   //  
-    //     command.Connection = connection;
-    //     command.CommandText = sqlQuery;
-    //
-    //     command.Parameters.AddWithValue("@Name", CreateNewAnimalDTO.Name);
-    //     command.Parameters.AddWithValue("@AnimalClass", CreateNewAnimalDTO.animalClassName);
-    //     command.Parameters.AddWithValue("@AdmissionDate", CreateNewAnimalDTO.AdmissionDate);
-    //     command.Parameters.AddWithValue("@OwnerId", CreateNewAnimalDTO.OwnerID);
-    //     
-    //     await connection.OpenAsync();
-    //     
-    //     var transaction = await connection.BeginTransactionAsync();
-    //     command.Transaction = transaction as SqlTransaction;
-    //     
-    //     try
-    //     {
-    //         var id = await command.ExecuteScalarAsync();
-    //
-    //         foreach (var procedure in CreateNewAnimalDTO.Procedures)
-    //         {
-    //             command.Parameters.Clear();
-    //             command.CommandText = "INSERT INTO Procedure_Animal VALUES(@ProcedureId, @Date)";
-    //             command.Parameters.AddWithValue("@ProcedureId", procedure.ProcedureId);
-    //             command.Parameters.AddWithValue("@Date", procedure.Date);
-    //
-    //             await command.ExecuteNonQueryAsync();
-    //         }
-    //
-    //         await transaction.CommitAsync();
-    //     }
-    //     catch (Exception)
-    //     {
-    //         await transaction.RollbackAsync();
-    //         throw;
-    //     }
-    //     
-    // }
+    public async Task<GetAnimalWithOwnerDTO> createNewAnimal(CreateNewAnimalDTO createNewAnimal)
+    {
+        var sqlQuery = @"INSERT INTO Animal VALUES(@Name, @AdmissionDate, @OwnerId);
+					   SELECT @@IDENTITY AS ID;";
+        
+        await using SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("Default"));
+        await using SqlCommand command = new SqlCommand();
+	    
+        command.Connection = connection;
+        command.CommandText = sqlQuery;
+    
+        command.Parameters.AddWithValue("@Name", createNewAnimal.Name);
+        command.Parameters.AddWithValue("@AnimalClass", createNewAnimal.animalClassName);
+        command.Parameters.AddWithValue("@AdmissionDate", createNewAnimal.AdmissionDate);
+        command.Parameters.AddWithValue("@OwnerId", createNewAnimal.OwnerID);
+        
+        await connection.OpenAsync();
+        
+        var transaction = await connection.BeginTransactionAsync();
+        command.Transaction = transaction as SqlTransaction;
+        
+        try
+        {
+            var id = await command.ExecuteScalarAsync();
+    
+            foreach (var procedure in createNewAnimal.Procedures)
+            {
+                command.Parameters.Clear();
+                command.CommandText = "INSERT INTO Procedure_Animal VALUES(@ProcedureId, @Date)";
+                command.Parameters.AddWithValue("@ProcedureId", procedure.ProcedureId);
+                command.Parameters.AddWithValue("@Date", procedure.Date);
+    
+                await command.ExecuteNonQueryAsync();
+            }
+    
+            await transaction.CommitAsync();
+        }
+        catch (Exception)
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+
+        return null;
+    }
 
 }
