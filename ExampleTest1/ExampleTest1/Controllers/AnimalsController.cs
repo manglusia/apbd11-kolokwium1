@@ -29,9 +29,9 @@ namespace ExampleTest1.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> AddSmth()
+        public async Task<IActionResult> AddSmth(CreateNewAnimalDTO createNewAnimalDto)
         {
-            
+            await _animalsRepository.createNewAnimal(createNewAnimalDto);
             return Created();
         }
         
