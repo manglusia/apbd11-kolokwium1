@@ -1,6 +1,8 @@
 using System.Transactions;
+using ExampleTest1.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ExampleTest1.Models.DTOs;
 
 namespace ExampleTest1.Controllers
 {
@@ -8,31 +10,31 @@ namespace ExampleTest1.Controllers
     [ApiController]
     public class AnimalsController : ControllerBase
     {
-        // private readonly IAnimalsRepository _animalsRepository;
-        // public AnimalsController(IAnimalsRepository animalsRepository)
-        // {
-        //     _animalsRepository = animalsRepository;
-        // }
+        private readonly IAnimalRepository _animalsRepository;
+        public AnimalsController(IAnimalRepository animalsRepository)
+        {
+            _animalsRepository = animalsRepository;
+        }
         
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSmth(int id)
         {
-            return Ok();
+            if (!await _animalsRepository.doesAnimalExists(id))
+            {
+                return NotFound();
+            }
+
+            var animals = _animalsRepository.GetAnimalWithOwner(id).Result;
+            return Ok(animals);
         }
         
-        // Version with implicit transaction
         [HttpPost]
         public async Task<IActionResult> AddSmth()
         {
+            
             return Created();
         }
         
-        // Version with transaction scope
-        [HttpPost]
-        [Route("with-scope")]
-        public async Task<IActionResult> AddSmthV2()
-        {
-            return Created();
-        }
+        
     }
 }
